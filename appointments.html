@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare Hospital - Appointments</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="brand">
+        <span class="logo">+</span>
+        <span>MediCare Hospital</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="book.html">Book Appointment</a>
+        <a href="appointments.html" class="active">Appointments</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <div class="card">
+        <div class="list-header">
+          <div>
+            <h1>All Appointments</h1>
+            <p class="subtitle">Every scheduled appointment, sorted by date and time.</p>
+          </div>
+          <a class="btn primary" href="book.html">+ New Appointment</a>
+        </div>
+
+        <div id="bookings-container">
+          <p class="empty">Loading appointments...</p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; MediCare Hospital. For demo use only.</p>
+    </footer>
+
+    <script src="appointments.js"></script>
+  </body>
+</html>
