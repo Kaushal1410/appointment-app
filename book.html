@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediCare Hospital - Book Appointment</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="brand">
+        <span class="logo">+</span>
+        <span>MediCare Hospital</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="book.html" class="active">Book Appointment</a>
+        <a href="appointments.html">Appointments</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <div class="card form-card">
+        <h1>Book an Appointment</h1>
+        <p class="subtitle">Please fill in the patient details and pick a time slot.</p>
+
+        <form id="booking-form" novalidate>
+          <fieldset>
+            <legend>Patient Information</legend>
+            <div class="grid-2">
+              <label>Full Name
+                <input type="text" id="name" placeholder="Jane Doe" required />
+              </label>
+              <label>Age
+                <input type="number" id="age" min="0" max="130" placeholder="34" required />
+              </label>
+              <label>Gender
+                <select id="gender" required>
+                  <option value="">Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+              <label>Phone Number
+                <input type="tel" id="phone" placeholder="+1 555 123 4567" required />
+              </label>
+              <label>Email
+                <input type="email" id="email" placeholder="jane@example.com" required />
+              </label>
+              <label class="full">Address
+                <input type="text" id="address" placeholder="123 Main St, Springfield" required />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Consultation Type</legend>
+            <div class="mode-toggle">
+              <label class="mode-option">
+                <input type="radio" name="mode" value="In-Person" checked />
+                <div class="mode-card">
+                  <strong>In-Person Visit</strong>
+                  <span>Come to the hospital and meet the doctor face-to-face.</span>
+                </div>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="mode" value="Online" />
+                <div class="mode-card">
+                  <strong>Online Consultation</strong>
+                  <span>Talk to the doctor over a secure video call from home.</span>
+                </div>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Appointment Details</legend>
+            <div class="grid-2">
+              <label>Department
+                <select id="department" required>
+                  <option value="">Select department</option>
+                  <option value="General Medicine">General Medicine</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="ENT (Ear, Nose, Throat)">ENT (Ear, Nose, Throat)</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Gynecology">Gynecology</option>
+                  <option value="Ophthalmology">Ophthalmology</option>
+                  <option value="Psychiatry">Psychiatry</option>
+                  <option value="Urology">Urology</option>
+                  <option value="Endocrinology">Endocrinology</option>
+                </select>
+              </label>
+              <label>Doctor
+                <select id="doctor" required disabled>
+                  <option value="">Select a department first</option>
+                </select>
+              </label>
+              <label>Date
+                <input type="date" id="date" required />
+              </label>
+              <label>Time Slot
+                <select id="time" required>
+                  <option value="">Select a time</option>
+                </select>
+              </label>
+              <label class="full">Reason for Visit / Symptoms
+                <textarea id="reason" rows="3" placeholder="Brief description of your symptoms or reason for the visit" required></textarea>
+              </label>
+            </div>
+          </fieldset>
+
+          <button type="submit">Book Appointment</button>
+        </form>
+
+        <p id="message" class="message" role="status"></p>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; MediCare Hospital. For demo use only.</p>
+    </footer>
+
+    <script src="book.js"></script>
+  </body>
+</html>
