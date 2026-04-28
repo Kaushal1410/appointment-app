@@ -1,1 +1,1 @@
-window.API_BASE = 'https://appointment-app-backend.onrender.com';
+window.API_BASE = 'https://your-real-render-url.onrender.com';
