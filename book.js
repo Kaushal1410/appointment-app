@@ -27,38 +27,57 @@ let DEPARTMENTS = {
   Urology: ['Dr. Deepak Menon', 'Dr. Isha Batra'],
   Endocrinology: ['Dr. Meera Kulkarni', 'Dr. Rahul Bansal'],
 };
+const TIME_SLOTS = [
+  '09:00 AM', '09:30 AM',
+  '10:00 AM', '10:30 AM',
+  '11:00 AM', '11:30 AM',
+  '12:00 PM',
+  '02:00 PM', '02:30 PM',
+  '03:00 PM', '03:30 PM',
+  '04:00 PM', '04:30 PM',
+  '05:00 PM',
+];
 
 function showMessage(text, type) {
   messageEl.textContent = text;
   messageEl.className = 'message ' + type;
 }
 
+function populateDepartments() {
+  departmentEl.innerHTML = '<option value="">Select department</option>';
+  Object.keys(DEPARTMENTS).forEach((d) => {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    departmentEl.appendChild(opt);
+  });
+}
+
+function populateTimeSlots(slots) {
+  timeEl.innerHTML = '<option value="">Select a time</option>';
+  slots.forEach((t) => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    timeEl.appendChild(opt);
+  });
+}
+
 const todayStr = new Date().toISOString().split('T')[0];
 dateEl.min = todayStr;
+populateDepartments();
+populateTimeSlots(TIME_SLOTS);
 
 async function loadMeta() {
   try {
     const res = await fetch('meta');
+    if (!res.ok) throw new Error('Could not load metadata');
     const meta = await res.json();
-    DEPARTMENTS = meta.departments || {};
-
-    departmentEl.innerHTML = '<option value="">Select department</option>';
-    Object.keys(DEPARTMENTS).forEach((d) => {
-      const opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = d;
-      departmentEl.appendChild(opt);
-    });
-
-    timeEl.innerHTML = '<option value="">Select a time</option>';
-    (meta.timeSlots || []).forEach((t) => {
-      const opt = document.createElement('option');
-      opt.value = t;
-      opt.textContent = t;
-      timeEl.appendChild(opt);
-    });
+    DEPARTMENTS = meta.departments || DEPARTMENTS;
+    populateDepartments();
+    populateTimeSlots(meta.timeSlots && meta.timeSlots.length ? meta.timeSlots : TIME_SLOTS);
   } catch (err) {
-    showMessage('Using default departments and doctors.', 'success');
+    showMessage('Using default departments, doctors, and time slots.', 'success');
   }
 }
 
