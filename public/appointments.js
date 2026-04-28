@@ -1,4 +1,10 @@
 const container = document.getElementById('bookings-container');
+const API_BASE = (window.API_BASE || '').replace(/\/$/, '');
+
+function apiUrl(path) {
+  if (!API_BASE) return path;
+  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+}
 
 function escapeHtml(str) {
   return String(str)
@@ -21,7 +27,7 @@ function formatDate(d) {
 
 async function loadBookings() {
   try {
-    const res = await fetch('bookings');
+    const res = await fetch(apiUrl('/bookings'));
     const bookings = await res.json();
 
     if (!Array.isArray(bookings) || bookings.length === 0) {

@@ -4,6 +4,12 @@ const departmentEl = document.getElementById('department');
 const doctorEl = document.getElementById('doctor');
 const timeEl = document.getElementById('time');
 const dateEl = document.getElementById('date');
+const API_BASE = (window.API_BASE || '').replace(/\/$/, '');
+
+function apiUrl(path) {
+  if (!API_BASE) return path;
+  return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+}
 
 let DEPARTMENTS = {
   'General Medicine': [
@@ -70,7 +76,7 @@ populateTimeSlots(TIME_SLOTS);
 
 async function loadMeta() {
   try {
-    const res = await fetch('meta');
+    const res = await fetch(apiUrl('/meta'));
     if (!res.ok) throw new Error('Could not load metadata');
     const meta = await res.json();
     DEPARTMENTS = meta.departments || DEPARTMENTS;
@@ -129,7 +135,7 @@ form.addEventListener('submit', async (event) => {
   showMessage('Booking your appointment...', '');
 
   try {
-    const res = await fetch('book', {
+    const res = await fetch(apiUrl('/book'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
