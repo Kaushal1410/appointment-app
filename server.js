@@ -1,11 +1,12 @@
 const express = require('express');
+const fs = require('fs/promises');
 const path = require('path');
-const mongoose = require('mongoose');
+const crypto = require('crypto');
 const cors = require('cors');
-const Booking = require('./models/Booking');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const BOOKINGS_FILE = path.join(__dirname, 'data', 'bookings.json');
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
@@ -56,16 +57,22 @@ const TIME_SLOTS = [
   '05:00 PM',
 ];
 
-async function connectToDatabase() {
-  let mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.log('No MONGODB_URI provided - starting in-memory MongoDB...');
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mem = await MongoMemoryServer.create();
-    mongoUri = mem.getUri();
+async function ensureStorage() {
+  await fs.mkdir(path.dirname(BOOKINGS_FILE), { recursive: true });
+  try {
+    await fs.access(BOOKINGS_FILE);
+  } catch (_err) {
+    await fs.writeFile(BOOKINGS_FILE, '[]\n', 'utf8');
   }
-  await mongoose.connect(mongoUri);
-  console.log('Connected to MongoDB');
+}
+
+async function readBookings() {
+  const raw = await fs.readFile(BOOKINGS_FILE, 'utf8');
+  return JSON.parse(raw);
+}
+
+async function writeBookings(bookings) {
+  await fs.writeFile(BOOKINGS_FILE, `${JSON.stringify(bookings, null, 2)}\n`, 'utf8');
 }
 
 app.get('/meta', (_req, res) => {
@@ -129,7 +136,10 @@ app.post('/book', async (req, res) => {
       return res.status(400).json({ error: 'Please pick today or a future date.' });
     }
 
-    const existing = await Booking.findOne({ doctor, date, time });
+    const bookings = await readBookings();
+    const existing = bookings.find((booking) => (
+      booking.doctor === doctor && booking.date === date && booking.time === time
+    ));
     if (existing) {
       return res.status(409).json({ error: 'Slot already booked' });
     }
@@ -140,7 +150,8 @@ app.post('/book', async (req, res) => {
       meetingLink = `https://meet.medicare-hospital.test/${id}`;
     }
 
-    const booking = await Booking.create({
+    const booking = {
+      id: crypto.randomUUID(),
       name: String(name).trim(),
       age: ageNum,
       gender,
@@ -154,13 +165,14 @@ app.post('/book', async (req, res) => {
       reason: String(reason).trim(),
       mode,
       meetingLink,
-    });
+      createdAt: new Date().toISOString(),
+    };
+
+    bookings.push(booking);
+    await writeBookings(bookings);
 
     res.status(201).json(booking);
   } catch (err) {
-    if (err && err.code === 11000) {
-      return res.status(409).json({ error: 'Slot already booked' });
-    }
     console.error('POST /book failed:', err);
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
@@ -168,7 +180,12 @@ app.post('/book', async (req, res) => {
 
 app.get('/bookings', async (_req, res) => {
   try {
-    const bookings = await Booking.find().sort({ date: 1, time: 1 });
+    const bookings = await readBookings();
+    bookings.sort((a, b) => {
+      const dateCompare = String(a.date).localeCompare(String(b.date));
+      if (dateCompare !== 0) return dateCompare;
+      return TIME_SLOTS.indexOf(a.time) - TIME_SLOTS.indexOf(b.time);
+    });
     res.json(bookings);
   } catch (err) {
     console.error('GET /bookings failed:', err);
@@ -176,7 +193,7 @@ app.get('/bookings', async (_req, res) => {
   }
 });
 
-connectToDatabase()
+ensureStorage()
   .then(() => {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on http://localhost:${PORT}`);
